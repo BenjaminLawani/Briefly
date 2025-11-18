@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briefly - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for webkit browsers for a cleaner look */
+        .tiktok-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .tiktok-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Light gray track */
+            border-radius: 10px;
+        }
+        .tiktok-scroll-container::-webkit-scrollbar-thumb {
+            background: #d1d5db; /* Gray-300 thumb */
+            border-radius: 10px;
+        }
+        .tiktok-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; /* Gray-400 on hover */
+        }
+
+        /* Aspect Ratio for responsive videos */
+        .aspect-w-16 {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+        }
+        .aspect-w-16 > * {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Scroll Snap Styles */
+        .tiktok-scroll-container {
+            scroll-snap-type: y mandatory; /* Enable vertical scroll snapping, mandatory means it *must* snap */
+        }
+        .lesson-snap-item {
+            scroll-snap-align: start; /* Each lesson card snaps to the start (top) of the scroll container */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <div class="flex min-h-screen">
+        <!-- Vertical Navbar -->
+        <aside class="w-64 bg-white border-r border-gray-100 flex flex-col p-6 shadow-sm">
+            <!-- Briefly Logo -->
+            <div class="mb-8">
+                <a href="#" class="text-3xl font-bold text-black">Briefly</a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 space-y-2">
+                <a href="#" class="flex items-center p-3 rounded-md text-black bg-gray-100 font-semibold transition-colors duration-200">
+                    <!-- Feed Icon (example: Home/Feed icon) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    My feed
+                </a>
+                <!-- Lesson Plan (at the bottom of the navbar) -->
+                <a href="#" class="flex items-center p-3 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                    <!-- Lesson Plan Icon (example: Book icon) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2.5a2.5 2.5 0 0 1-2.5 2.5H7.5A2.5 2.5 0 0 1 5 19.5z"/><path d="M14 10V3a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v7"/><path d="M13 14h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v7"/></svg>
+                    Lesson Plan
+                </a>
+            </nav>
+
+            <!-- User Profile and Logout -->
+            <div class="mt-auto pt-6 border-t border-gray-100">
+                <div class="relative">
+                    <button id="user-profile-button" class="flex items-center justify-between w-full p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 cursor-pointer">
+                        <div class="flex items-center">
+                            <img src="https://api.dicebear.com/7.x/initials/svg?seed=JD" alt="User Avatar" class="w-8 h-8 rounded-full mr-3">
+                            <span id="user-name" class="font-medium text-sm">John Doe</span>
+                        </div>
+                        <!-- Dropdown arrow -->
+                        <svg id="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div id="logout-menu" class="absolute bottom-full mb-2 left-0 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 z-10 hidden">
+                        <button id="logout-button" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 hover:text-red-700 transition-colors duration-200">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area - My Feed -->
+        <main class="flex-1 p-8 overflow-y-auto tiktok-scroll-container">
+            <h1 class="text-3xl font-bold mb-8">My Feed</h1>
+
+            <div id="lessons-feed-container" class="space-y-6 max-w-2xl mx-auto">
+                <!-- Lesson items with actual content will be injected here -->
+            </div>
+
+            <div id="loading-spinner" class="text-center py-6 hidden">
+                <svg class="animate-spin h-8 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-gray-500 text-sm mt-2">Loading more lessons...</p>
+            </div>
+
+            <div id="no-more-lessons" class="text-center py-6 text-gray-500 text-sm hidden">
+                <p>You've reached the end of your feed for now!</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Navbar / User Profile Logic ---
+            const userProfileButton = document.getElementById('user-profile-button');
+            const logoutMenu = document.getElementById('logout-menu');
+            const logoutButton = document.getElementById('logout-button');
+            const dropdownArrow = document.getElementById('dropdown-arrow');
+            // const userName = document.getElementById('user-name'); // Optional: for fetching user's actual name
+
+            userProfileButton.addEventListener('click', () => {
+                const isHidden = logoutMenu.classList.toggle('hidden');
+                if (isHidden) {
+                    dropdownArrow.style.transform = 'rotate(0deg)';
+                } else {
+                    dropdownArrow.style.transform = 'rotate(180deg)';
+                }
+            });
+
+            // Close the logout menu if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!userProfileButton.contains(event.target) && !logoutMenu.contains(event.target)) {
+                    logoutMenu.classList.add('hidden');
+                    dropdownArrow.style.transform = 'rotate(0deg)';
+                }
+            });
+
+            logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('accessToken'); // Clear the stored token
+                window.location.href = '/auth/login'; // Redirect to login page
+            });
+
+            // --- My Feed API Integration and Infinite Scroll Logic ---
+            const lessonsFeedContainer = document.getElementById('lessons-feed-container');
+            const mainContentArea = document.querySelector('main');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const noMoreLessonsMessage = document.getElementById('no-more-lessons');
+
+            let subLessonsDisplayedCount = 0; // Tracks total individual sub-lessons rendered
+            let lessonBatchesFetchedCount = 0; // Tracks how many LessonResponse objects we've fetched from /lessons/user/{user_id}
+            const subLessonsPerGenerate = 5; // Number of sub-lessons to request during initial generation
+            const lessonBatchesPerRequest = 2; // Number of LessonResponse objects to fetch per scroll
+            let isLoadingMore = false; // Flag to prevent multiple simultaneous API calls
+
+            // Helper function to make authenticated API calls
+            async function fetchApi(url, options = {}) {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    // console.log("No access token found, redirecting to login.");
+                    // window.location.href = '/auth/login'; // Uncomment for strict auth enforcement
+                    throw new Error('Authentication required. Please log in.'); // For dev, throw error without redirect
+                }
+
+                options.headers = {
+                    ...options.headers,
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                };
+
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    let errorDetail = `API error: ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorDetail = errorData.detail || errorDetail;
+                    } catch (e) {
+                        // Response might not be JSON
+                    }
+                    throw new Error(errorDetail);
+                }
+                return response.json();
+            }
+
+            // Function to get icon based on lesson type (from backend 'VIDEO', 'AUDIO', 'TEXT')
+            function getTypeIcon(type) {
+                switch (type.toLowerCase()) {
+                    case 'video':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-blue-500"><path d="m22 8-6 4 6 4V8Z"/><path d="M14 12H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2Z"/></svg>`;
+                    case 'audio':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-green-500"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>`;
+                    case 'text':
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-purple-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>`;
+                    default:
+                        return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-gray-500"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>`; // Default icon
+                }
+            }
+
+            // Function to render an individual LessonContent object as a card
+            const renderLessonCard = (lesson) => {
+                let lessonContentHtml = '';
+                const contentType = lesson.content_type ? lesson.content_type.toLowerCase() : 'unknown';
+                const displayType = lesson.content_type || 'Unknown';
+                const duration = lesson.duration || 'N/A';
+                const difficulty = lesson.difficulty || 'N/A';
+                const tags = lesson.tags || [];
+
+                if (contentType === 'video') {
+                    lessonContentHtml = `
+                        <div class="aspect-w-16 bg-gray-200 rounded-md overflow-hidden mb-4">
+                            <iframe
+                                src="${lesson.content_url}"
+                                title="${lesson.title}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                                loading="lazy"
+                                class="w-full h-full"
+                            ></iframe>
+                        </div>
+                    `;
+                } else if (contentType === 'audio') {
+                    lessonContentHtml = `
+                        <div class="w-full bg-gray-100 rounded-md overflow-hidden mb-4 relative">
+                            ${lesson.poster_image ? `<img src="${lesson.poster_image}" alt="Audio Lesson Thumbnail" class="w-full h-48 object-cover rounded-md mb-2">` : `<div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600 rounded-md mb-2">Audio Thumbnail</div>`}
+                            <audio controls class="w-full mt-2">
+                                <source src="${lesson.content_url}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    `;
+                } else if (contentType === 'text') {
+                    lessonContentHtml = `
+                        <div class="prose prose-sm max-w-none text-gray-700 leading-relaxed mb-4">
+                            ${lesson.content_text || '<p>No text content available.</p>'}
+                        </div>
+                    `;
+                }
+
+                const lessonCard = document.createElement('div');
+                lessonCard.className = 'bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200 lesson-snap-item';
+                lessonCard.innerHTML = `
+                    <div class="flex items-center mb-2 text-sm text-gray-600">
+                        ${getTypeIcon(contentType)}
+                        <span>${displayType} &middot; ${duration} &middot; ${difficulty}</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">${lesson.title}</h3>
+                    <p class="text-gray-700 text-base mb-4">${lesson.description}</p>
+                    
+                    <!-- Embedded Lesson Content -->
+                    ${lessonContentHtml}
+
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        ${tags.map(tag => `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full">${tag}</span>`).join('')}
+                        <button class="ml-auto px-3 py-1 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
+                            View Lesson
+                        </button>
+                    </div>
+                `;
+                lessonsFeedContainer.appendChild(lessonCard);
+            };
+
+            // Function to display an array of LessonContent objects
+            const displayLessonsToFeed = (lessonsArray) => {
+                if (!lessonsArray || lessonsArray.length === 0) return;
+
+                lessonsArray.forEach(lesson => {
+                    renderLessonCard(lesson);
+                });
+                subLessonsDisplayedCount += lessonsArray.length;
+            };
+
+            // Main function to load lessons from the backend
+            const loadLessonsIntoFeed = async (isInitialLoad = false) => {
+                if (isLoadingMore) return;
+                isLoadingMore = true;
+                loadingSpinner.classList.remove('hidden');
+                noMoreLessonsMessage.classList.add('hidden'); // Hide "no more lessons" message
+
+                try {
+                    let newLessonsToDisplay = [];
+
+                    if (isInitialLoad && subLessonsDisplayedCount === 0) {
+                        // On initial load, try to GENERATE lessons first, assuming user just onboarded
+                        console.log('Attempting to generate initial lessons...');
+                        try {
+                            const generatedResponse = await fetchApi('/lessons/generate', {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    num_of_lessons: subLessonsPerGenerate // Request a batch of sub-lessons
+                                })
+                            });
+                            if (generatedResponse && generatedResponse.lessons && generatedResponse.lessons.length > 0) {
+                                newLessonsToDisplay = generatedResponse.lessons;
+                                console.log('Generated lessons received:', newLessonsToDisplay);
+                            } else {
+                                throw new Error('Lesson generation produced no content, trying to fetch existing.');
+                            }
+                        } catch (error) {
+                            console.warn('Lesson generation failed:', error.message, 'Falling back to fetching existing lessons.');
+                            // Fall through to fetch existing lessons if generation fails
+                        }
+                    }
+
+                    // If no new lessons from generation, or if not initial load, fetch existing batches
+                    // The backend /lessons/user/{user_id} returns List[LessonResponse]
+                    if (newLessonsToDisplay.length === 0) { // Only fetch existing if generation didn't provide any
+                        console.log(`Fetching existing lesson batches (skip=${lessonBatchesFetchedCount}, limit=${lessonBatchesPerRequest})...`);
+                        const existingLessonBatches = await fetchApi(`/lessons/user/me?skip=${lessonBatchesFetchedCount}&limit=${lessonBatchesPerRequest}`);
+                        
+                        existingLessonBatches.forEach(batch => {
+                            if (batch.lessons && batch.lessons.length > 0) {
+                                newLessonsToDisplay.push(...batch.lessons);
+                            }
+                        });
+
+                        if (newLessonsToDisplay.length > 0) {
+                            console.log('Fetched existing sub-lessons:', newLessonsToDisplay);
+                            lessonBatchesFetchedCount += existingLessonBatches.length; // Increment batch count
+                        } else {
+                            console.log('No more existing lesson batches found.');
+                            // If this was the first attempt to load lessons at all, show a specific message
+                            if (subLessonsDisplayedCount === 0) {
+                                lessonsFeedContainer.innerHTML = `
+                                    <div class="text-center py-12">
+                                        <p class="text-lg text-gray-600 mb-4">It looks like your profile isn't fully set up yet, or we couldn't find any lessons for you.</p>
+                                        <p class="text-gray-500">Please <a href="/onboarding" class="text-black underline hover:text-gray-800">complete your onboarding profile</a> to get personalized lessons.</p>
+                                    </div>
+                                `;
+                            } else {
+                                noMoreLessonsMessage.classList.remove('hidden');
+                            }
+                            return; // Stop here if no lessons were found/generated
+                        }
+                    }
+
+                    // Display the lessons
+                    displayLessonsToFeed(newLessonsToDisplay);
+
+                } catch (error) {
+                    console.error('Error loading lessons into feed:', error.message);
+                    if (subLessonsDisplayedCount === 0) { // Only show error message if no lessons loaded at all
+                        lessonsFeedContainer.innerHTML = `
+                            <div class="text-center py-12 text-red-600">
+                                <p>Failed to load lessons. Please try again later.</p>
+                                <p class="text-sm text-gray-500 mt-2">${error.message}</p>
+                            </div>
+                        `;
+                    } else {
+                        alert(`Failed to load more lessons: ${error.message}`);
+                    }
+                    noMoreLessonsMessage.classList.add('hidden'); // Ensure this is hidden on error
+                } finally {
+                    loadingSpinner.classList.add('hidden');
+                    isLoadingMore = false;
+                }
+            };
+
+            // Initial load of lessons when the dashboard loads
+            loadLessonsIntoFeed(true);
+
+            // Infinite scroll event listener
+            mainContentArea.addEventListener('scroll', () => {
+                const scrollThreshold = 400; // Pixels from bottom to trigger load
+                if (mainContentArea.scrollTop + mainContentArea.clientHeight >= mainContentArea.scrollHeight - scrollThreshold && !isLoadingMore) {
+                    loadLessonsIntoFeed(false); // Not initial load, fetch more existing batches
+                }
+            });
+
+            // Optional: Check if access token exists, if not, redirect to login
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                // For demonstration purposes, this is commented out.
+                // In a real app, uncommenting this ensures authenticated access.
+                // console.log("No access token found, redirecting to login.");
+                // window.location.href = '/auth/login'; 
+            }
+        });
+    </script>
+</body>
+</html>
