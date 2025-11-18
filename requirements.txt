@@ -5,6 +5,7 @@ bcrypt==5.0.0
 cachetools==6.2.2
 certifi==2025.11.12
 charset-normalizer==3.4.4
+click==8.3.1
 distro==1.9.0
 fastapi==0.121.2
 google-auth==2.43.0
@@ -32,4 +33,5 @@ tenacity==9.1.2
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.5.0
+uvicorn==0.38.0
 websockets==15.0.1
