@@ -1,7 +1,6 @@
 from datetime import datetime
 from pydantic import (
     BaseModel,
-    str,
     Field,
     UUID4
 )
