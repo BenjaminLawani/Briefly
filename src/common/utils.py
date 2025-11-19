@@ -46,22 +46,16 @@ async def generate_lesson_content(
     profile = db_session.query(Profile).filter(
         Profile.user_id == user_id
     ).first()
-    
-    # If the user hasn't completed onboarding yet, create a minimal default profile
-    # so we can still generate generic lessons. This helps the dashboard render
-    # initial lessons for users who didn't finish onboarding.
     if not profile:
         try:
             # Ensure user_id is a valid UUID before creating a Profile object with it
             user_uuid = uuid.UUID(user_id)
         except ValueError:
-            # If user_id is not a valid UUID string, handle appropriately (e.g., raise error or fallback)
-            # For now, we'll raise an error as user_id from current_user.id should be valid UUID.
             raise ValueError(f"Invalid user_id format: {user_id}. Expected a valid UUID.")
 
         default_profile = Profile(
             learning_type=LearningType.TEXT, # Default to TEXT
-            topics=["general programming concepts"], # Provide a default topic
+            topics=["general programming concepts"], 
             goal="gain foundational knowledge in various tech areas",
             user_id=user_uuid,
         )
