@@ -1,13 +1,13 @@
 from datetime import datetime
 from pydantic import (
     BaseModel,
-    EmailStr,
+    str,
     Field,
     UUID4
 )
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: str
     username: str = Field(..., min_length=8, max_length=32)
     password: str = Field(..., min_length=6)
 
@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     id: UUID4
-    email: EmailStr
+    email: str
     username: str
     created_at: datetime
     updated_at: datetime
