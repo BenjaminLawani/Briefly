@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+from fastapi import (
+    FastAPI,
+    Request
+)
 from fastapi.staticfiles import StaticFiles
 
 from src.common.db import init_db
+from src.common.config import templates
+
 from src.auth.routes import auth_router
 from src.onboarding.routes import profile_router
 from src.dashboard.routes import dashboard_router
@@ -26,8 +31,5 @@ app.include_router(dashboard_router)
 app.include_router(lessons_router)
 
 @app.get("/")
-def root():
-    return {
-        "hello": "world"
-    }
-
+def root(req: Request):
+    return templates.TemplateResponse("index.html", {"request":req})

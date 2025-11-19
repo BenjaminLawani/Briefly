@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briefly - Learn anything in seconds, not hours.</title>
+    <!-- Include Tailwind CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Custom CSS for animations -->
+    <style>
+        /* Custom Keyframe Animations */
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes blobPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #9ca3af; } /* gray-400 */
+        }
+
+        /* Classes for JavaScript-triggered animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform; /* Hint for browser optimization */
+        }
+
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Specific animation applications */
+        .animate-blob-pulse {
+            animation: blobPulse 5s infinite ease-in-out;
+        }
+
+        .animate-typing-effect {
+            overflow: hidden; /* Ensures the text is hidden until typed */
+            white-space: nowrap; /* Keeps the content on a single line */
+            border-right: 2px solid transparent; /* Blinking cursor effect */
+            animation: 
+                typing 2s steps(30, end) forwards,
+                blink-caret 0.75s step-end infinite;
+            animation-delay: 0.5s; /* Delay for typing to start */
+            width: 0; /* Initial width for typing effect */
+        }
+
+        /* Staggered animation for grid items */
+        .grid > .animate-on-scroll {
+            transition-delay: var(--stagger-delay, 0s);
+        }
+
+        /* Nav shadow for scroll */
+        .nav-scrolled {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white selection:bg-gray-100">
+
+    <!-- Nav Component -->
+    <nav id="main-nav" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md transition-shadow duration-300">
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-xl font-bold tracking-tight">
+          Briefly
+        </a>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+        <a href="#features" class="hover:text-black transition-colors">Features</a>
+        <a href="#demo" class="hover:text-black transition-colors">Demo</a>
+        <a href="#pricing" class="hover:text-black transition-colors">Pricing</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="/auth/login" class="text-sm font-medium hover:text-gray-600 transition-colors hidden sm:block">
+          Log in
+        </a>
+        <a href="/auth/get-started" class="inline-block">
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-6 bg-black text-white hover:bg-black/90 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-150 ease-out">Get Started</button>
+        </a>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero Component -->
+      <section class="pt-32 pb-0 md:pt-48 px-6 max-w-7xl mx-auto text-center overflow-hidden">
+        <div class="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-600 mb-8 animate-on-scroll" style="--stagger-delay: 0.1s;">
+          <span class="flex h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+          Now available in public beta
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-balance mb-8 animate-on-scroll" style="--stagger-delay: 0.2s;">
+          Learn anything in <br class="hidden md:block" />
+          <span class="text-gray-400">seconds, not hours.</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 text-balance leading-relaxed animate-on-scroll" style="--stagger-delay: 0.3s;">
+          Briefly uses AI to turn complex topics into addictive, TikTok-style microlessons. 
+          Master new skills one swipe at a time.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-on-scroll" style="--stagger-delay: 0.4s;">
+          <a href="/auth/get-started" class="inline-block">
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-full text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 px-8 bg-black text-white hover:bg-black/90 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-150 ease-out">
+              Start Learning Free
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-4 w-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+          </a>
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-full text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 px-8 border border-gray-200 bg-white hover:bg-gray-50 hover:text-black hover:scale-[1.02] active:scale-[0.98] transition-transform duration-150 ease-out">
+            View Demo
+          </button>
+        </div>
+
+        <div class="relative mx-auto max-w-5xl h-32">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-blue-100 to-purple-100 rounded-full blur-3xl opacity-30 -z-10 animate-blob-pulse"></div>
+        </div>
+      </section>
+
+      <!-- FeatureGrid Component -->
+      <section id="features" class="pt-12 pb-24 px-6 max-w-7xl mx-auto">
+        <div class="mb-16 max-w-2xl">
+          <h2 class="text-3xl md:text-5xl font-bold tracking-tight mb-6 animate-on-scroll" style="--stagger-delay: 0.1s;">
+            Knowledge, <br />
+            <span class="text-gray-400">reimagined for the scroll era.</span>
+          </h2>
+          <p class="text-lg text-gray-600 animate-on-scroll" style="--stagger-delay: 0.2s;">
+            We stripped away the fluff. No hour-long lectures. No boring PDFs. 
+            Just pure, distilled knowledge delivered in the format you already love.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[300px]">
+          
+          <!-- Instant Generation Card -->
+          <div class="md:col-span-3 rounded-3xl bg-black text-white p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-12 text-left group animate-on-scroll" style="--stagger-delay: 0.3s;">
+            <div class="flex-1">
+              <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap w-6 h-6 text-white"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <h3 class="text-3xl font-semibold mb-4">Instant Generation</h3>
+              <p class="text-gray-400 text-lg leading-relaxed max-w-md">
+                Type any topic. Get a course in seconds. From "Quantum Mechanics" to "Sourdough Baking", Briefly builds a custom curriculum just for you.
+              </p>
+            </div>
+            <div class="w-full md:w-1/2 space-y-4">
+               <div class="h-20 w-full bg-white/10 rounded-2xl flex items-center px-6 gap-4 border border-white/5 transition-transform duration-300 group-hover:scale-[1.02]" style="transition-delay: 50ms;">
+                  <div class="w-10 h-10 rounded-full bg-white/20 animate-pulse shrink-0"></div>
+                  <div class="space-y-2 w-full">
+                    <div class="h-2.5 w-3/4 bg-white/20 rounded-full"></div>
+                    <div class="h-2.5 w-1/2 bg-white/10 rounded-full"></div>
+                  </div>
+               </div>
+               <div class="h-20 w-full bg-white/10 rounded-2xl flex items-center px-6 gap-4 border border-white/5 transition-transform duration-300 group-hover:scale-[1.02]" style="transition-delay: 100ms;">
+                  <div class="w-10 h-10 rounded-full bg-white/20 animate-pulse shrink-0"></div>
+                  <div class="space-y-2 w-full">
+                    <div class="h-2.5 w-3/4 bg-white/20 rounded-full"></div>
+                    <div class="h-2.5 w-1/2 bg-white/10 rounded-full"></div>
+                  </div>
+               </div>
+               <div class="h-20 w-full bg-white/10 rounded-2xl flex items-center px-6 gap-4 border border-white/5 transition-transform duration-300 group-hover:scale-[1.02]" style="transition-delay: 150ms;">
+                  <div class="w-10 h-10 rounded-full bg-white/20 animate-pulse shrink-0"></div>
+                  <div class="space-y-2 w-full">
+                    <div class="h-2.5 w-3/4 bg-white/20 rounded-full"></div>
+                    <div class="h-2.5 w-1/2 bg-white/10 rounded-full"></div>
+                  </div>
+               </div>
+            </div>
+          </div>
+
+          <!-- AI-Powered Curriculum Card -->
+          <div class="md:col-span-2 row-span-1 md:row-span-2 rounded-3xl bg-gray-50 p-8 flex flex-col items-start justify-between gap-8 group hover:bg-gray-100 transition-colors duration-300 hover:shadow-lg animate-on-scroll" style="--stagger-delay: 0.4s;">
+            <div class="w-full">
+              <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain w-6 h-6 text-black"><path d="M12 5a3 3 0 1 0-3-3v2a7 7 0 0 0-4.5 2.5 3 3 0 0 0-2.5 5v2a3 3 0 1 0 3 3v-2a7 7 0 0 0 4.5-2.5 3 3 0 1 0 2.5-5V5z"/><path d="M12 5a3 3 0 1 1 3-3v2a7 7 0 0 1 4.5 2.5 3 3 0 1 1 2.5 5v2a3 3 0 1 1-3 3v-2a7 7 0 0 1-4.5-2.5 3 3 0 1 1-2.5-5V5z"/></svg>
+              </div>
+              <h3 class="text-3xl font-semibold mb-4">AI-Powered Curriculum</h3>
+              <p class="text-gray-500 text-lg max-w-md">
+                Our AI analyzes millions of data points to structure the perfect learning path for you. 
+                It adapts in real-time based on what you watch and skip.
+              </p>
+            </div>
+            <div class="h-48 w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+               <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50 group-hover:scale-105 transition-transform duration-500"></div>
+               <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+                  <span class="text-sm font-mono text-gray-400 animate-typing-effect">Generating lesson path...</span>
+               </div>
+            </div>
+          </div>
+
+          <!-- Global Knowledge Card -->
+          <div class="rounded-3xl bg-gray-50 p-8 flex flex-col justify-between group hover:bg-gray-100 transition-colors duration-300 hover:shadow-lg animate-on-scroll" style="--stagger-delay: 0.5s;">
+            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 group-hover:rotate-[-5deg] transition-transform duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe w-6 h-6 text-black"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20A14.5 14.5 0 0 0 12 2"/><path d="M2 12h20"/></svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Global Knowledge</h3>
+              <p class="text-sm text-gray-500">Access information from verified sources worldwide.</p>
+            </div>
+          </div>
+
+          <!-- Micro-Learning Card -->
+          <div class="rounded-3xl bg-gray-50 p-8 flex flex-col justify-between group hover:bg-gray-100 transition-colors duration-300 hover:shadow-lg animate-on-scroll" style="--stagger-delay: 0.6s;">
+            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 group-hover:rotate-[5deg] transition-transform duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-6 h-6 text-black"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2">Micro-Learning</h3>
+              <p class="text-sm text-gray-500">Lessons under 60 seconds. Perfect for busy schedules.</p>
+            </div>
+          </div>
+
+          <!-- Gamified Progress Card -->
+          <div class="md:col-span-2 rounded-3xl bg-gray-50 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 group hover:bg-gray-100 transition-colors duration-300 hover:shadow-lg animate-on-scroll" style="--stagger-delay: 0.7s;">
+             <div class="flex-1">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 group-hover:translate-y-[-4px] transition-transform duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-6 h-6 text-black"><path d="M9.9 10.3c.6 0 1.1-.4 1.4-.9L13.9 4a.7.7 0 0 1 1.4 0l2.6 5.4c.3.5.8.9 1.4.9l5.5.9a.7.7 0 0 1 0 1.4l-5.5.9c-.6 0-1.1.4-1.4.9L15.3 20a.7.7 0 0 1-1.4 0l-2.6-5.4c-.3-.5-.8-.9-1.4-.9l-5.5-.9a.7.7 0 0 1 0-1.4l5.5-.9Z"/><path d="M2 3a.5.5 0 0 0-.5.5v1A.5.5 0 0 0 2 5h1a.5.5 0 0 0 .5-.5v-1A.5.5 0 0 0 3 3H2Z"/><path d="M7 8a.5.5 0 0 0-.5.5v1A.5.5 0 0 0 7 10h1a.5.5 0 0 0 .5-.5v-1A.5.5 0 0 0 8 8H7Z"/><path d="M13 18a.5.5 0 0 0-.5.5v1A.5.5 0 0 0 13 20h1a.5.5 0 0 0 .5-.5v-1A.5.5 0 0 0 14 18H13Z"/></svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Gamified Progress</h3>
+                <p class="text-sm text-gray-500">Earn streaks, badges, and compete with friends on the leaderboard.</p>
+             </div>
+             <div class="flex items-center gap-2">
+                <div class="px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 text-sm font-medium group-hover:scale-105 group-hover:rotate-1 transition-transform duration-200" style="transition-delay: 50ms;">🔥 12 Day Streak</div>
+                <div class="px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 text-sm font-medium group-hover:scale-105 group-hover:rotate-[-1deg] transition-transform duration-200" style="transition-delay: 100ms;">🏆 Top 1%</div>
+             </div>
+          </div>
+          
+          <!-- Smart Stacking Card -->
+          <div class="relative group animate-on-scroll" style="--stagger-delay: 0.8s;">
+            <div class="absolute top-4 left-4 right-[-16px] bottom-[-16px] rounded-3xl bg-gray-100 border border-gray-200 z-0 transition-transform duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
+            <div class="absolute top-2 left-2 right-[-8px] bottom-[-8px] rounded-3xl bg-gray-50 border border-gray-200 z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:translate-y-1"></div>
+            
+            <div class="relative h-full rounded-3xl bg-white border border-gray-100 p-8 flex flex-col justify-between hover:border-gray-200 transition-colors z-20 hover:shadow-lg">
+              <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers w-6 h-6 text-black"><path d="m12.83 2.18-.3.9a4.5 4.5 0 0 0-6.64 6.64l-.9.3A8 8 0 1 1 20 12.83M21.72 2.27a.75.75 0 0 0-1.06 0l-1.93 1.93ZM12.83 2.18l-1.93 1.93"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold mb-2">Smart Stacking</h3>
+                <p class="text-sm text-gray-500">Concepts build upon each other automatically.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CTA Component -->
+      <section id="cta" class="py-24 px-6 max-w-7xl mx-auto text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6 animate-on-scroll" style="--stagger-delay: 0.1s;">Ready to start learning?</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-10 animate-on-scroll" style="--stagger-delay: 0.2s;">Join thousands of learners mastering new skills with Briefly.</p>
+        <a href="/auth/get-started" class="inline-block animate-on-scroll" style="--stagger-delay: 0.3s;">
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-full text-base font-medium h-12 px-8 bg-black text-white hover:bg-black/90 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-150 ease-out">
+            Get Started Free
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2 h-4 w-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </a>
+      </section>
+
+    </main>
+
+    <!-- Footer Component -->
+    <footer class="py-12 px-6 border-t border-gray-100 animate-on-scroll" style="--stagger-delay: 0.1s;">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2">
+          <span class="text-xl font-bold tracking-tight">Briefly</span>
+        </div>
+        <div class="flex gap-8 text-sm text-gray-600">
+          <a href="#" class="hover:text-black hover:underline">Privacy</a>
+          <a href="#" class="hover:text-black hover:underline">Terms</a>
+          <a href="#" class="hover:text-black hover:underline">Twitter</a>
+          <a href="#" class="hover:text-black hover:underline">Instagram</a>
+        </div>
+        <div class="text-sm text-gray-400">
+          © 2025 Briefly Inc.
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript for Intersection Observer and Nav Shadow -->
+    <script>
+        // Intersection Observer for "animate on scroll"
+        const animateElements = document.querySelectorAll('.animate-on-scroll');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = parseFloat(entry.target.style.getPropertyValue('--stagger-delay')) || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('is-visible');
+                    }, delay * 1000); // Convert seconds to milliseconds
+                } else {
+                    // Optional: remove 'is-visible' when out of view, to re-animate on scroll back
+                    // entry.target.classList.remove('is-visible');
+                }
+            });
+        }, {
+            threshold: 0.1, // Trigger when 10% of the element is visible
+            rootMargin: '0px 0px -50px 0px' // Slightly reduce viewport height to trigger a bit earlier
+        });
+
+        animateElements.forEach(el => observer.observe(el));
+
+
+        // Nav Bar Shadow on Scroll
+        const mainNav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { // Add shadow after scrolling 50px
+                mainNav.classList.add('shadow-md');
+            } else {
+                mainNav.classList.remove('shadow-md');
+            }
+        });
+
+        // Initialize nav state on load
+        if (window.scrollY > 50) {
+            mainNav.classList.add('shadow-md');
+        }
+    </script>
+</body>
+</html>

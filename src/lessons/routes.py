@@ -10,8 +10,10 @@ from sqlalchemy.orm import Session
 
 from .schemas import (
     LessonRequest,
-    LessonResponse
+    LessonResponse,
+    LessonItem # Added LessonItem
 )
+from src.common.enums import LearningType # Added LearningType enum
 
 from src.auth.models import User
 
@@ -31,14 +33,14 @@ lessons_router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def generate_lessons(
-    request: LessonRequest,
+    request: LessonRequest, # LessonRequest no longer requires user_id
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
     Generate personalized lesson content based on user's onboarding preferences.
     
-    - **user_id**: UUID of the user
+    - **user_id**: UUID of the user (derived from authentication)
     - **lesson_title**: Optional specific topic to focus on
     - **num_of_lessons**: Number of lessons to generate (default: 5, max: 20)
     
@@ -50,13 +52,13 @@ async def generate_lessons(
     """
     try:
         result = await generate_lesson_content(
-            user_id=str(current_user.id),
+            user_id=str(current_user.id), # User ID correctly taken from current_user
             db_session=db,
             lesson_title=request.lesson_title,
             num_of_lessons=request.num_of_lessons
         )
         
-        return LessonResponse(**result)
+        return LessonResponse(**result) # Pydantic will validate result against new schema
         
     except ValueError as e:
         # User profile not found
@@ -100,8 +102,8 @@ async def get_lesson(
         return LessonResponse(
             lesson_id=lesson_doc["_id"],
             num_of_lessons=lesson_doc.get("num_of_lessons", len(lesson_doc.get("lessons", []))),
-            lessons=lesson_doc.get("lessons", []),
-            learning_type=lesson_doc["learning_type"],
+            lessons=[LessonItem(**item) for item in lesson_doc.get("lessons", [])], # Explicitly convert to LessonItem
+            learning_type=LearningType(lesson_doc["learning_type"]), # Ensure enum conversion
             created_at=lesson_doc["created_at"].isoformat()
         )
         
@@ -115,37 +117,36 @@ async def get_lesson(
 
 
 @lessons_router.get(
-    "/user/{user_id}",
+    "/user/{user_id}", # The user_id in path is primarily for documentation/schema. current_user.id is used for lookup.
     response_model=List[LessonResponse],
 )
 async def get_user_lessons(
     limit: int = 10,
     skip: int = 0,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-
+    current_user: User = Depends(get_current_user) # Ensures lessons for authenticated user
 ):
     
     try:
         lessons = list(
-            collection.find({"user_id": str(current_user.id)})
+            collection.find({"user_id": str(current_user.id)}) # Use current_user.id for fetching
             .sort("created_at", -1)
             .skip(skip)
             .limit(limit)
         )
         
         if not lessons:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No lessons found for user {str(current_user.id)}"
-            )
+            # Return empty list or 204 No Content for no lessons, instead of 404
+            # A 404 for "no lessons found" can be misleading if the user exists but just has no lessons.
+            # Returning an empty list is generally better for lists of resources.
+            return [] 
         
         return [
             LessonResponse(
                 lesson_id=lesson["_id"],
                 num_of_lessons=lesson.get("num_of_lessons", len(lesson.get("lessons", []))),
-                lessons=lesson.get("lessons", []),
-                learning_type=lesson["learning_type"],
+                lessons=[LessonItem(**item) for item in lesson.get("lessons", [])], # Explicitly convert to LessonItem
+                learning_type=LearningType(lesson["learning_type"]), # Ensure enum conversion
                 created_at=lesson["created_at"].isoformat()
             )
             for lesson in lessons
@@ -166,16 +167,28 @@ async def get_user_lessons(
 )
 async def delete_lesson(
     lesson_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user) # Added current_user for authorization
 ):
     try:
-        result = collection.delete_one({"_id": lesson_id})
-        
-        if result.deleted_count == 0:
+        # Add authorization: ensure user can only delete their own lessons
+        lesson_doc = collection.find_one({"_id": lesson_id})
+        if not lesson_doc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Lesson with id {lesson_id} not found"
             )
+        if lesson_doc["user_id"] != str(current_user.id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to delete this lesson"
+            )
+
+        result = collection.delete_one({"_id": lesson_id})
+        
+        if result.deleted_count == 0:
+            # This path is already handled by the authorization check above
+            pass
         
         return None
         

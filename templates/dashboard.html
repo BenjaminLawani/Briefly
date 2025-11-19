@@ -11,6 +11,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Prevent body scroll, main handles it */
         }
         /* Custom scrollbar for webkit browsers for a cleaner look */
         .tiktok-scroll-container::-webkit-scrollbar {
@@ -46,88 +47,81 @@
         .tiktok-scroll-container {
             scroll-snap-type: y mandatory; /* Enable vertical scroll snapping, mandatory means it *must* snap */
         }
+        /* Each lesson card snaps to the start (top) of the scroll container */
         .lesson-snap-item {
-            scroll-snap-align: start; /* Each lesson card snaps to the start (top) of the scroll container */
+            scroll-snap-align: start; 
+            /* Occupy full viewport height */
+            min-height: 100vh; 
+            max-height: 100vh; /* Prevent cards from exceeding viewport height */
+            overflow: hidden; /* Hide main internal scrollbars, content below will handle scrollbar-hide for specific elements */
+            position: relative; /* Needed for absolute positioning of child elements */
+        }
+
+        /* Custom scrollbar hide for inner content within lesson cards */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
-    <div class="flex min-h-screen">
-        <!-- Vertical Navbar -->
-        <aside class="w-64 bg-white border-r border-gray-100 flex flex-col p-6 shadow-sm">
-            <!-- Briefly Logo -->
-            <div class="mb-8">
-                <a href="#" class="text-3xl font-bold text-black">Briefly</a>
+    <!-- User Profile and Logout (Top Right, fixed) -->
+    <div class="fixed top-4 right-4 z-50">
+        <div class="relative">
+            <button id="user-profile-button" class="flex items-center justify-between p-2 rounded-full bg-white border border-gray-200 shadow-md hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
+                <img src="https://api.dicebear.com/7.x/initials/svg?seed=user" alt="User Avatar" class="w-8 h-8 rounded-full mr-2">
+                <span id="user-name" class="font-medium text-sm text-gray-800">User</span>
+                <!-- Dropdown arrow -->
+                <svg id="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 ml-2 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div id="logout-menu" class="absolute top-full mt-2 right-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50 hidden">
+                <button id="logout-button" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 hover:text-red-700 transition-colors duration-200">
+                    Logout
+                </button>
             </div>
-
-            <!-- Navigation Links -->
-            <nav class="flex-1 space-y-2">
-                <a href="#" class="flex items-center p-3 rounded-md text-black bg-gray-100 font-semibold transition-colors duration-200">
-                    <!-- Feed Icon (example: Home/Feed icon) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    My feed
-                </a>
-                <!-- Lesson Plan (at the bottom of the navbar) -->
-                <a href="#" class="flex items-center p-3 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200">
-                    <!-- Lesson Plan Icon (example: Book icon) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2.5a2.5 2.5 0 0 1-2.5 2.5H7.5A2.5 2.5 0 0 1 5 19.5z"/><path d="M14 10V3a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v7"/><path d="M13 14h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v7"/></svg>
-                    Lesson Plan
-                </a>
-            </nav>
-
-            <!-- User Profile and Logout -->
-            <div class="mt-auto pt-6 border-t border-gray-100">
-                <div class="relative">
-                    <button id="user-profile-button" class="flex items-center justify-between w-full p-3 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors duration-200 cursor-pointer">
-                        <div class="flex items-center">
-                            <img src="https://api.dicebear.com/7.x/initials/svg?seed=JD" alt="User Avatar" class="w-8 h-8 rounded-full mr-3">
-                            <span id="user-name" class="font-medium text-sm">John Doe</span>
-                        </div>
-                        <!-- Dropdown arrow -->
-                        <svg id="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </button>
-                    <div id="logout-menu" class="absolute bottom-full mb-2 left-0 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 z-10 hidden">
-                        <button id="logout-button" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 hover:text-red-700 transition-colors duration-200">
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Area - My Feed -->
-        <main class="flex-1 p-8 overflow-y-auto tiktok-scroll-container">
-            <h1 class="text-3xl font-bold mb-8">My Feed</h1>
-
-            <div id="lessons-feed-container" class="space-y-6 max-w-2xl mx-auto">
-                <!-- Lesson items with actual content will be injected here -->
-            </div>
-
-            <div id="loading-spinner" class="text-center py-6 hidden">
-                <svg class="animate-spin h-8 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="text-gray-500 text-sm mt-2">Loading more lessons...</p>
-            </div>
-
-            <div id="no-more-lessons" class="text-center py-6 text-gray-500 text-sm hidden">
-                <p>You've reached the end of your feed for now!</p>
-            </div>
-        </main>
+        </div>
     </div>
+
+    <!-- Main Content Area - Full-screen swipable feed -->
+    <main class="flex-1 p-0 h-screen overflow-y-auto tiktok-scroll-container">
+
+        <!-- Lessons Feed Container - holds the full-height, snapable lesson cards -->
+        <div id="lessons-feed-container" class="w-full h-full">
+            <!-- Lesson items with actual content will be injected here by JavaScript -->
+        </div>
+
+        <!-- Loading spinner and "No more lessons" message (placed inside main for scroll context) -->
+        <!-- These also need to be snap-items so they take up full screen when displayed -->
+        <div id="loading-spinner" class="lesson-snap-item flex flex-col items-center justify-center bg-gray-50 hidden">
+            <svg class="animate-spin h-8 w-8 text-gray-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-gray-500 text-sm mt-2">Loading more lessons...</p>
+        </div>
+
+        <div id="no-more-lessons" class="lesson-snap-item flex flex-col items-center justify-center bg-gray-50 text-gray-500 text-sm hidden">
+            <p class="text-lg text-gray-600 mb-4 text-center">You've reached the end of your feed for now!</p>
+            <p class="text-gray-500 text-center">Consider updating your <a href="/onboarding" class="text-black underline hover:text-gray-800">onboarding profile</a> for new recommendations.</p>
+        </div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Navbar / User Profile Logic ---
+            // --- User Profile Logic (Top Right) ---
             const userProfileButton = document.getElementById('user-profile-button');
             const logoutMenu = document.getElementById('logout-menu');
             const logoutButton = document.getElementById('logout-button');
             const dropdownArrow = document.getElementById('dropdown-arrow');
-            // const userName = document.getElementById('user-name'); // Optional: for fetching user's actual name
 
-            userProfileButton.addEventListener('click', () => {
+            userProfileButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent document click from closing it immediately
                 const isHidden = logoutMenu.classList.toggle('hidden');
                 if (isHidden) {
                     dropdownArrow.style.transform = 'rotate(0deg)';
@@ -149,25 +143,25 @@
                 window.location.href = '/auth/login'; // Redirect to login page
             });
 
-            // --- My Feed API Integration and Infinite Scroll Logic ---
+            // --- Main Feed API Integration and Infinite Scroll Logic ---
             const lessonsFeedContainer = document.getElementById('lessons-feed-container');
-            const mainContentArea = document.querySelector('main');
+            const mainContentArea = document.querySelector('main'); // This is now the full scrollable area
             const loadingSpinner = document.getElementById('loading-spinner');
             const noMoreLessonsMessage = document.getElementById('no-more-lessons');
 
             let subLessonsDisplayedCount = 0; // Tracks total individual sub-lessons rendered
             let lessonBatchesFetchedCount = 0; // Tracks how many LessonResponse objects we've fetched from /lessons/user/{user_id}
-            const subLessonsPerGenerate = 5; // Number of sub-lessons to request during initial generation
-            const lessonBatchesPerRequest = 2; // Number of LessonResponse objects to fetch per scroll
+            const subLessonsPerGenerate = 5; // Number of sub-lessons to request when generating new content
+            const lessonBatchesPerRequest = 2; // Number of LessonResponse objects to fetch per scroll from existing
             let isLoadingMore = false; // Flag to prevent multiple simultaneous API calls
+            let hasExhaustedExistingLessons = false; // Flag to know when to start generating more aggressively
 
             // Helper function to make authenticated API calls
             async function fetchApi(url, options = {}) {
                 const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
-                    // console.log("No access token found, redirecting to login.");
-                    // window.location.href = '/auth/login'; // Uncomment for strict auth enforcement
-                    throw new Error('Authentication required. Please log in.'); // For dev, throw error without redirect
+                    window.location.href = '/auth/login'; // Redirect for strict auth enforcement
+                    throw new Error('Authentication required. Please log in.');
                 }
 
                 options.headers = {
@@ -190,6 +184,22 @@
                 return response.json();
             }
 
+                // Populate the user profile bubble with the logged-in user's email
+                (async function populateUserProfile() {
+                    try {
+                        const user = await fetchApi('/auth/me');
+                        if (user && user.email) {
+                            const userNameSpan = document.getElementById('user-name');
+                            const avatarImg = document.querySelector('#user-profile-button img');
+                            userNameSpan.textContent = user.email;
+                            const seed = encodeURIComponent(user.email);
+                            avatarImg.src = `https://api.dicebear.com/7.x/initials/svg?seed=${seed}`;
+                        }
+                    } catch (e) {
+                        console.warn('Failed to fetch user profile:', e);
+                    }
+                })();
+
             // Function to get icon based on lesson type (from backend 'VIDEO', 'AUDIO', 'TEXT')
             function getTypeIcon(type) {
                 switch (type.toLowerCase()) {
@@ -204,11 +214,31 @@
                 }
             }
 
-            // Function to render an individual LessonContent object as a card
+            const COLOR_PALETTES = [
+                { bg: "bg-orange-50", accent: "text-orange-600" },
+                { bg: "bg-blue-50", accent: "text-blue-600" },
+                { bg: "bg-purple-50", accent: "text-purple-600" },
+                { bg: "bg-amber-50", accent: "text-amber-600" },
+                { bg: "bg-green-50", accent: "text-green-600" },
+                { bg: "bg-rose-50", accent: "text-rose-600" },
+                { bg: "bg-red-50", accent: "text-red-600" },
+                { bg: "bg-indigo-50", accent: "text-indigo-600" },
+                { bg: "bg-pink-50", accent: "text-pink-600" },
+                { bg: "bg-lime-50", accent: "text-lime-600" },
+            ];
+
+            // Helper to get a random color palette
+            function getRandomPalette() {
+                const randomIndex = Math.floor(Math.random() * COLOR_PALETTES.length);
+                return COLOR_PALETTES[randomIndex];
+            }
+
+            // Function to render an individual LessonContent object as a swipable card
             const renderLessonCard = (lesson) => {
+                const palette = getRandomPalette(); // Get random colors for each card
                 let lessonContentHtml = '';
-                const contentType = lesson.content_type ? lesson.content_type.toLowerCase() : 'unknown';
-                const displayType = lesson.content_type || 'Unknown';
+                const contentType = lesson.content.content_type ? lesson.content.content_type.toLowerCase() : 'unknown';
+                const displayType = lesson.content.content_type || 'Unknown';
                 const duration = lesson.duration || 'N/A';
                 const difficulty = lesson.difficulty || 'N/A';
                 const tags = lesson.tags || [];
@@ -217,7 +247,7 @@
                     lessonContentHtml = `
                         <div class="aspect-w-16 bg-gray-200 rounded-md overflow-hidden mb-4">
                             <iframe
-                                src="${lesson.content_url}"
+                                src="${lesson.content.content_url}"
                                 title="${lesson.title}"
                                 frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -230,9 +260,9 @@
                 } else if (contentType === 'audio') {
                     lessonContentHtml = `
                         <div class="w-full bg-gray-100 rounded-md overflow-hidden mb-4 relative">
-                            ${lesson.poster_image ? `<img src="${lesson.poster_image}" alt="Audio Lesson Thumbnail" class="w-full h-48 object-cover rounded-md mb-2">` : `<div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600 rounded-md mb-2">Audio Thumbnail</div>`}
+                            ${lesson.content.poster_image ? `<img src="${lesson.content.poster_image}" alt="Audio Lesson Thumbnail" class="w-full h-48 object-cover rounded-md mb-2">` : `<div class="w-full h-48 bg-gray-300 flex items-center justify-center text-gray-600 rounded-md mb-2">Audio Thumbnail</div>`}
                             <audio controls class="w-full mt-2">
-                                <source src="${lesson.content_url}" type="audio/mpeg">
+                                <source src="${lesson.content.content_url}" type="audio/mpeg">
                                 Your browser does not support the audio element.
                             </audio>
                         </div>
@@ -240,29 +270,27 @@
                 } else if (contentType === 'text') {
                     lessonContentHtml = `
                         <div class="prose prose-sm max-w-none text-gray-700 leading-relaxed mb-4">
-                            ${lesson.content_text || '<p>No text content available.</p>'}
+                            ${lesson.content.content_text || '<p>No text content available.</p>'}
                         </div>
                     `;
                 }
 
                 const lessonCard = document.createElement('div');
-                lessonCard.className = 'bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200 lesson-snap-item';
+                // The lesson card itself is the snap item, occupying the full viewport height
+                lessonCard.className = `lesson-snap-item flex relative ${palette.bg}`;
                 lessonCard.innerHTML = `
-                    <div class="flex items-center mb-2 text-sm text-gray-600">
-                        ${getTypeIcon(contentType)}
-                        <span>${displayType} &middot; ${duration} &middot; ${difficulty}</span>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-4">${lesson.title}</h3>
-                    <p class="text-gray-700 text-base mb-4">${lesson.description}</p>
-                    
-                    <!-- Embedded Lesson Content -->
-                    ${lessonContentHtml}
-
-                    <div class="flex flex-wrap gap-2 text-xs">
-                        ${tags.map(tag => `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full">${tag}</span>`).join('')}
-                        <button class="ml-auto px-3 py-1 bg-black text-white rounded-md hover:bg-gray-800 transition-colors">
-                            View Lesson
-                        </button>
+                    <!-- Main content area for text and media, scrollable if needed -->
+                    <div class="flex-1 flex flex-col p-6 pt-8 overflow-y-auto scrollbar-hide">
+                        <div class="flex items-center mb-2 text-sm text-gray-600">
+                            ${getTypeIcon(contentType)}
+                            <span class="${palette.accent} font-semibold">${displayType}</span> &nbsp; <span class="text-gray-600">&middot; ${duration} &middot; ${difficulty}</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-900 mb-4 leading-tight">${lesson.title}</h3>
+                        <p class="text-lg font-medium text-gray-700 mb-6">${lesson.description}</p>
+                        ${lessonContentHtml}
+                        <div class="flex flex-wrap gap-2 text-xs mt-auto pt-4 border-t border-gray-200">
+                            ${tags.map(tag => `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full">${tag}</span>`).join('')}
+                        </div>
                     </div>
                 `;
                 lessonsFeedContainer.appendChild(lessonCard);
@@ -279,40 +307,20 @@
             };
 
             // Main function to load lessons from the backend
-            const loadLessonsIntoFeed = async (isInitialLoad = false) => {
+            const loadLessonsIntoFeed = async () => {
                 if (isLoadingMore) return;
                 isLoadingMore = true;
+                // Temporarily append the loading spinner as a snap item until content loads
+                lessonsFeedContainer.appendChild(loadingSpinner);
                 loadingSpinner.classList.remove('hidden');
                 noMoreLessonsMessage.classList.add('hidden'); // Hide "no more lessons" message
 
                 try {
                     let newLessonsToDisplay = [];
+                    let fetchedAnyContent = false; // Track if we got anything from any source
 
-                    if (isInitialLoad && subLessonsDisplayedCount === 0) {
-                        // On initial load, try to GENERATE lessons first, assuming user just onboarded
-                        console.log('Attempting to generate initial lessons...');
-                        try {
-                            const generatedResponse = await fetchApi('/lessons/generate', {
-                                method: 'POST',
-                                body: JSON.stringify({
-                                    num_of_lessons: subLessonsPerGenerate // Request a batch of sub-lessons
-                                })
-                            });
-                            if (generatedResponse && generatedResponse.lessons && generatedResponse.lessons.length > 0) {
-                                newLessonsToDisplay = generatedResponse.lessons;
-                                console.log('Generated lessons received:', newLessonsToDisplay);
-                            } else {
-                                throw new Error('Lesson generation produced no content, trying to fetch existing.');
-                            }
-                        } catch (error) {
-                            console.warn('Lesson generation failed:', error.message, 'Falling back to fetching existing lessons.');
-                            // Fall through to fetch existing lessons if generation fails
-                        }
-                    }
-
-                    // If no new lessons from generation, or if not initial load, fetch existing batches
-                    // The backend /lessons/user/{user_id} returns List[LessonResponse]
-                    if (newLessonsToDisplay.length === 0) { // Only fetch existing if generation didn't provide any
+                    // 1. Attempt to fetch existing lessons first, if not exhausted
+                    if (!hasExhaustedExistingLessons) {
                         console.log(`Fetching existing lesson batches (skip=${lessonBatchesFetchedCount}, limit=${lessonBatchesPerRequest})...`);
                         const existingLessonBatches = await fetchApi(`/lessons/user/me?skip=${lessonBatchesFetchedCount}&limit=${lessonBatchesPerRequest}`);
                         
@@ -325,63 +333,98 @@
                         if (newLessonsToDisplay.length > 0) {
                             console.log('Fetched existing sub-lessons:', newLessonsToDisplay);
                             lessonBatchesFetchedCount += existingLessonBatches.length; // Increment batch count
+                            fetchedAnyContent = true;
                         } else {
-                            console.log('No more existing lesson batches found.');
-                            // If this was the first attempt to load lessons at all, show a specific message
-                            if (subLessonsDisplayedCount === 0) {
-                                lessonsFeedContainer.innerHTML = `
-                                    <div class="text-center py-12">
-                                        <p class="text-lg text-gray-600 mb-4">It looks like your profile isn't fully set up yet, or we couldn't find any lessons for you.</p>
-                                        <p class="text-gray-500">Please <a href="/onboarding" class="text-black underline hover:text-gray-800">complete your onboarding profile</a> to get personalized lessons.</p>
-                                    </div>
-                                `;
-                            } else {
-                                noMoreLessonsMessage.classList.remove('hidden');
-                            }
-                            return; // Stop here if no lessons were found/generated
+                            console.log('No more existing lesson batches found. Will now rely on generation for subsequent calls.');
+                            hasExhaustedExistingLessons = true; // Mark that existing lessons are exhausted
                         }
                     }
 
-                    // Display the lessons
-                    displayLessonsToFeed(newLessonsToDisplay);
+                    // 2. If no existing lessons were fetched (or they are exhausted), attempt to generate new ones
+                    if (!fetchedAnyContent || hasExhaustedExistingLessons) {
+                        console.log(`Attempting to generate ${subLessonsPerGenerate} new lessons...`);
+                        try {
+                            const generatedResponse = await fetchApi('/lessons/generate', {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    num_of_lessons: subLessonsPerGenerate
+                                })
+                            });
+                            if (generatedResponse && generatedResponse.lessons && generatedResponse.lessons.length > 0) {
+                                newLessonsToDisplay.push(...generatedResponse.lessons); // Add generated lessons
+                                console.log('Generated additional lessons received:', generatedResponse.lessons);
+                                fetchedAnyContent = true;
+                            } else {
+                                throw new Error('Generation produced no content.'); // Treat empty generation as a failure to get new content
+                            }
+                        } catch (error) {
+                            console.warn('Lesson generation failed:', error.message);
+                            // Fall through to "no more lessons" message if generation fails
+                        }
+                    }
+
+                    // Display the lessons or show 'no more lessons' message
+                    if (newLessonsToDisplay.length > 0) {
+                        displayLessonsToFeed(newLessonsToDisplay);
+                    } else {
+                        console.log('No new lessons were found or generated after all attempts.');
+                        // Only show this permanent message if no lessons have been displayed at all
+                        // and we can't get any new ones.
+                        if (subLessonsDisplayedCount === 0) {
+                            // If it's the very first load and we couldn't get anything
+                            lessonsFeedContainer.innerHTML = ''; // Clear any potential loading spinner
+                            lessonsFeedContainer.appendChild(noMoreLessonsMessage); // Add the message
+                            noMoreLessonsMessage.classList.remove('hidden');
+                        } else {
+                            // If we already had lessons but now ran out, just show the "end of feed" message.
+                            lessonsFeedContainer.appendChild(noMoreLessonsMessage); // Add the message at the end
+                            noMoreLessonsMessage.classList.remove('hidden');
+                        }
+                    }
 
                 } catch (error) {
                     console.error('Error loading lessons into feed:', error.message);
                     if (subLessonsDisplayedCount === 0) { // Only show error message if no lessons loaded at all
-                        lessonsFeedContainer.innerHTML = `
-                            <div class="text-center py-12 text-red-600">
-                                <p>Failed to load lessons. Please try again later.</p>
-                                <p class="text-sm text-gray-500 mt-2">${error.message}</p>
-                            </div>
+                        lessonsFeedContainer.innerHTML = ''; // Clear any potential loading spinner
+                        const errorMessageDiv = document.createElement('div');
+                        errorMessageDiv.className = 'lesson-snap-item flex flex-col items-center justify-center bg-gray-50 text-red-600 text-center py-12';
+                        errorMessageDiv.innerHTML = `
+                            <p>Failed to load lessons. Please try again later.</p>
+                            <p class="text-sm text-gray-500 mt-2">${error.message}</p>
                         `;
+                        lessonsFeedContainer.appendChild(errorMessageDiv);
                     } else {
+                        // If we already have lessons, an alert is sufficient for subsequent errors.
                         alert(`Failed to load more lessons: ${error.message}`);
                     }
-                    noMoreLessonsMessage.classList.add('hidden'); // Ensure this is hidden on error
                 } finally {
-                    loadingSpinner.classList.add('hidden');
+                    // Always remove the loading spinner when done, whether successful or not
+                    if (loadingSpinner.parentNode === lessonsFeedContainer) {
+                        lessonsFeedContainer.removeChild(loadingSpinner);
+                    }
+                    loadingSpinner.classList.add('hidden'); // Ensure it's hidden
                     isLoadingMore = false;
                 }
             };
 
             // Initial load of lessons when the dashboard loads
-            loadLessonsIntoFeed(true);
+            loadLessonsIntoFeed();
 
             // Infinite scroll event listener
             mainContentArea.addEventListener('scroll', () => {
-                const scrollThreshold = 400; // Pixels from bottom to trigger load
+                // Trigger loading when scrolling near the end of the content.
+                // A small threshold like 1 or 0 is appropriate for full-page snap scrolling.
+                const scrollThreshold = 1; 
                 if (mainContentArea.scrollTop + mainContentArea.clientHeight >= mainContentArea.scrollHeight - scrollThreshold && !isLoadingMore) {
-                    loadLessonsIntoFeed(false); // Not initial load, fetch more existing batches
+                    loadLessonsIntoFeed();
                 }
             });
 
             // Optional: Check if access token exists, if not, redirect to login
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) {
-                // For demonstration purposes, this is commented out.
-                // In a real app, uncommenting this ensures authenticated access.
-                // console.log("No access token found, redirecting to login.");
-                // window.location.href = '/auth/login'; 
+                console.log("No access token found, redirecting to login.");
+                window.location.href = '/auth/login';
             }
         });
     </script>

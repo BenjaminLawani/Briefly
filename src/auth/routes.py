@@ -28,6 +28,8 @@ from src.common.security import (
     verify_password,
 )
 
+from src.common.security import get_current_user
+
 auth_router = APIRouter(
     prefix="/auth",
     tags=["AUTHENTICATION"]
@@ -105,3 +107,9 @@ def get_login(req: Request):
 @auth_router.get("/get-started")
 def get_login(req: Request):
     return templates.TemplateResponse("get-started.html", {"request": req})
+
+
+@auth_router.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    """Return the currently authenticated user's basic profile."""
+    return current_user
