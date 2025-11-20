@@ -25,10 +25,13 @@ from .config import settings
 
 from src.auth.models import User
 
-ctx = CryptContext(schemes=["argon2"])
+ctx = CryptContext(schemes=["bcrypt"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 def hash_password(plain: str) -> str:
-    return ctx.hash(plain)
+    b = plain.encode("utf-8")
+    truncated = b[:72]
+    safe = truncated.decode("utf-8", "ignore")
+    return ctx.hash(safe)
 
 
 def verify_password(plain: str, hashed: str) -> bool:

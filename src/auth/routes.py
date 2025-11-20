@@ -85,7 +85,7 @@ def signup(
         )
     try:
         new_user = User(**user.model_dump(exclude_unset=True))
-        new_user.password = hash_password(user.password)[:72]
+        new_user.password = hash_password(user.password)
         new_user.user_last_login_ip = req.client.host
         db.add(new_user)
         db.commit()
