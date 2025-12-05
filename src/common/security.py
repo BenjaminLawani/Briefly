@@ -1,11 +1,11 @@
 from datetime import (
+
     datetime,
     timedelta,
     UTC
 )
 
-from passlib.context import CryptContext
-
+import bcrypt
 from jwt import (
     encode,
     decode,
@@ -25,18 +25,15 @@ from .config import settings
 
 from src.auth.models import User
 
-ctx = CryptContext(schemes=["bcrypt"])
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 def hash_password(plain: str) -> str:
-    b = plain.encode("utf-8")
-    truncated = b[:72]
-    safe = truncated.decode("utf-8", "ignore")
-    return ctx.hash(safe)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(plain.encode('utf-8'), salt).decode('utf-8')
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return ctx.verify(plain, hashed)
-
+    return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
 def jwt_encode(data: dict) -> str:
     return encode(data, settings.JWT_KEY, algorithm="HS256")
 
